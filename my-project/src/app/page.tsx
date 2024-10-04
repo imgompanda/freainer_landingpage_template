@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BookOpen, Code, Brain, Zap } from "lucide-react";
 import Script from "next/script";
+import TallyFormButton from "@/components/TallyFormButton";
 
 declare global {
   interface Window {
@@ -30,37 +31,21 @@ export default function Home() {
     restDelta: 0.001,
   });
 
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://tally.so/widgets/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIfMobile();
+
+    window.addEventListener("resize", checkIfMobile);
 
     return () => {
-      document.body.removeChild(script);
+      window.removeEventListener("resize", checkIfMobile);
     };
   }, []);
-
-  const openTallyPopup = () => {
-    if (window.Tally) {
-      window.Tally.openPopup("wb8xN2", {
-        width: 400,
-        autoClose: 5000,
-        layout: "default",
-        alignLeft: false,
-        hideTitle: true,
-        overlay: false, // 배경 어두워지는 효과 제거
-        emoji: {
-          text: "📅",
-          animation: "none"
-        },
-        position: {
-          x: "right",
-          y: "bottom"
-        },
-      });
-    }
-  };
 
   const features = [
     {
@@ -79,7 +64,7 @@ export default function Home() {
       icon: <Brain className="w-8 h-8" />,
       title: "AI에게 똑똑하게 질문하기",
       description:
-        "AI를 제대로 활용하려면 명령을 잘 작성하는 법도 중요하죠. Cursor에서 AI에게 효과적으로 질문하고 원하는 답을 얻는 방법을 익혀요.",
+        "AI를 제대로 활용하려면 명령을 잘 작성하는 법도 중요죠. Cursor에서 AI에게 효과적으로 질문하고 원하는 답을 얻는 방법을 익혀요.",
     },
     {
       icon: <Zap className="w-8 h-8" />,
@@ -112,7 +97,7 @@ export default function Home() {
       job: "백엔드 개발자",
       avatar: "D",
       quote:
-        "백엔드 개발자라서 프론트엔드 작업에는 늘 어려움이 있었는데, 커서 바이블 덕분에 제가 상상하는 디자인을 구현할 수 있게 됐어요. 이제는 AI를 통해 UI/UX 개발도 더 자신 있게 할 수 있습니다.",
+        "백엔드 개발자라서 프론트엔드 작업에는 늘 어려움이 있었는데, 커서 바이블 덕분에 제가 상상하는 디자인을 구현할 수 있게 됐어요. 이제는 AI를 통해 UI/UX 개발도 더 자 있게 할 수 있습니다.",
     },
     {
       name: "Sophia",
@@ -126,7 +111,7 @@ export default function Home() {
 
   return (
     <>
-      <div ref={targetRef} className="min-h-screen bg-white text-black">
+      <div ref={targetRef} className="min-h-screen bg-white text-black relative">
         <motion.div
           className="fixed top-0 left-0 right-0 h-1 bg-black z-50"
           style={{ scaleX: smoothProgress }}
@@ -139,10 +124,11 @@ export default function Home() {
           <p className="text-xl text-center text-gray-600 mb-8">
             지금 예약하면 50% 할인! 여러분의 아이디어를 실현할 절호의 기회!
           </p>
-          <Button 
+          <Button
             className="bg-black text-white hover:bg-gray-800"
             onClick={() => {
-              const reservationButton = document.getElementById('reservation-button');
+              const reservationButton =
+                document.getElementById("reservation-button");
               if (reservationButton) {
                 reservationButton.click();
               }
@@ -306,10 +292,11 @@ export default function Home() {
               }}
               className="max-w-md mx-auto"
             >
-              <Button 
+              <Button
                 className="w-full bg-black text-white hover:bg-gray-800"
                 onClick={() => {
-                  const reservationButton = document.getElementById('reservation-button');
+                  const reservationButton =
+                    document.getElementById("reservation-button");
                   if (reservationButton) {
                     reservationButton.click();
                   }
@@ -326,16 +313,8 @@ export default function Home() {
             <p>&copy; 2024 커서 바이블. All rights reserved.</p>
           </div>
         </footer>
-
-        {/* 예약 버튼을 오른쪽 하단에 고정 */}
-        <button 
-          id="reservation-button"
-          className="fixed bottom-4 right-4 z-50 w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-gray-800 transition-colors duration-200"
-          onClick={openTallyPopup}
-        >
-          📅
-        </button>
       </div>
+      <TallyFormButton />
     </>
   );
 }
