@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -19,8 +19,40 @@ export default function TallyFormButton() {
     script.async = true;
     document.body.appendChild(script);
 
+    // CSS를 추가하여 Tally 로더를 숨깁니다. !important를 사용하여 우선순위를 높입니다.
+    const style = document.createElement("style");
+    style.textContent = `
+      .tally-loader, .tally-overlay {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // JavaScript를 사용하여 로딩 요소를 직접 제거합니다.
+    const removeLoader = () => {
+      const loader = document.querySelector(".tally-loader");
+      const overlay = document.querySelector(".tally-overlay");
+      if (loader) loader.remove();
+      if (overlay) overlay.remove();
+    };
+
+    // MutationObserver를 사용하여 동적으로 추가되는 요소를 감시합니다.
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+          removeLoader();
+        }
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       document.body.removeChild(script);
+      document.head.removeChild(style);
+      observer.disconnect();
     };
   }, []);
 
@@ -42,7 +74,24 @@ export default function TallyFormButton() {
           x: "right",
           y: "bottom",
         },
-        onOpen: () => setIsLoading(false),
+        onOpen: () => {
+          setIsLoading(false);
+          // 팝업이 열린 후에도 로더를 제거합니다.
+          setTimeout(() => {
+            const loader = document.querySelector(".tally-loader");
+            const overlay = document.querySelector(".tally-overlay");
+            if (loader) loader.remove();
+            if (overlay) overlay.remove();
+          }, 100);
+        },
+        hideLoadingIndicator: true,
+        customCSS: `
+          .tally-loader, .tally-overlay {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+          }
+        `,
       });
     }
   };
@@ -61,8 +110,8 @@ export default function TallyFormButton() {
         className="bg-black text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-gray-800 transition-colors duration-200"
         onClick={openTallyPopup}
         style={{
-          width: "56px",
-          height: "56px",
+          width: "64px", // 버튼 크기를 조금 더 크게 조정
+          height: "64px",
         }}
         disabled={isLoading}
       >
@@ -70,7 +119,7 @@ export default function TallyFormButton() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-6 h-6 border-t-2 border-white rounded-full"
+            className="w-8 h-8 border-t-2 border-white rounded-full" // 로딩 애니메이션 크기 조정
           />
         ) : (
           "📅"
