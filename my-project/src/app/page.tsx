@@ -5,9 +5,19 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Code, Brain, Zap } from "lucide-react";
-import Script from "next/script";
+import {
+  BookOpen,
+  Code,
+  Brain,
+  Zap,
+  Lightbulb,
+  DollarSign,
+  Rocket,
+  Users,
+} from "lucide-react";
+
 import TallyFormButton from "@/components/TallyFormButton";
+import { useInView } from "react-intersection-observer";
 
 declare global {
   interface Window {
@@ -109,9 +119,40 @@ export default function Home() {
     },
   ];
 
+  const benefits = [
+    {
+      icon: <Lightbulb className="w-8 h-8" />,
+      title: "아이디어 실현",
+      description: "전문적인 코딩 지식 없이도 웹과 앱을 만들 수 있어요.",
+    },
+    {
+      icon: <DollarSign className="w-8 h-8" />,
+      title: "비용 절감",
+      description: "저비용 고효율 접근으로 효율적인 서비스 제작이 가능해요.",
+    },
+    {
+      icon: <Rocket className="w-8 h-8" />,
+      title: "빠른 학습",
+      description: "쉬운 설명과 풍부한 시각 자료로 빠르게 익힐 수 있어요.",
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "다양한 대상",
+      description: "1인 개발자, 디자이너, PM 등 모두에게 적합해요.",
+    },
+  ];
+
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
   return (
     <>
-      <div ref={targetRef} className="min-h-screen bg-white text-black relative">
+      <div
+        ref={targetRef}
+        className="min-h-screen bg-white text-black relative"
+      >
         <motion.div
           className="fixed top-0 left-0 right-0 h-1 bg-black z-50"
           style={{ scaleX: smoothProgress }}
@@ -180,6 +221,37 @@ export default function Home() {
             </div>
           </section>
 
+          <section className="mb-16" ref={ref}>
+            <motion.h2
+              initial={{ opacity: 0, y: 50 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5 }}
+              className="text-3xl font-semibold mb-6 text-center"
+            >
+              Cursor Bible의 주요 이점
+            </motion.h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {benefits.map((benefit, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="h-full border-2 border-black">
+                    <CardContent className="flex flex-col items-start p-6 h-full">
+                      <div className="mb-4">{benefit.icon}</div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-gray-600">{benefit.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
           <section className="mb-16">
             <motion.h2
               style={{
@@ -220,6 +292,33 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
+            </motion.div>
+          </section>
+
+          <section className="mb-16">
+            <motion.h2
+              style={{
+                opacity: useTransform(smoothProgress, [0.6, 0.7], [0, 1]),
+                y: useTransform(smoothProgress, [0.6, 0.7], [50, 0]),
+              }}
+              className="text-3xl font-semibold mb-6 text-center"
+            >
+              Cursor Bible로 해결하세요
+            </motion.h2>
+            <motion.div
+              style={{
+                opacity: useTransform(smoothProgress, [0.65, 0.75], [0, 1]),
+                scale: useTransform(smoothProgress, [0.65, 0.75], [0.9, 1]),
+              }}
+              className="bg-gray-100 p-8 rounded-lg shadow-lg"
+            >
+              <ul className="list-disc pl-5 space-y-2">
+                <li>전문적인 코딩 지식 없이도 웹과 앱 제작 가능</li>
+                <li>PDF 파일과 영상 강의를 통한 상세한 학습</li>
+                <li>실용적인 연습 프로젝트로 실전 능력 향상</li>
+                <li>아이디어를 실제 서비스로 구현하는 방법 학습</li>
+                <li>저비용 고효율의 서비스 제작 접근법</li>
+              </ul>
             </motion.div>
           </section>
 
